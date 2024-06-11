@@ -54,7 +54,8 @@ export default function ClaimSwap() {
       var transactions = [];
       for (let txId of txIds) {
         const transactionData = await getTransactionData(txId);
-        if (!transactionData) {
+        if (transactionData === null) {
+          setStep(START_STEP);
           return;
         }
         transactions.push(transactionData);
@@ -129,14 +130,18 @@ export default function ClaimSwap() {
     );
   }
 
-  if (txIds.length === 0 || !shareTransactions) {
+  if (
+    txIds.length === 0 ||
+    !shareTransactions ||
+    shareTransactions.length === 0
+  ) {
     return (
       <main className="flex flex-col mx-auto justify-between h-[75vh] md:h-[80vh] text-center">
         <h1 className="text-4xl font-semibold text-primary-gray px-4 py-2">
           Claim Swap
         </h1>
         <p className="text-primary-gray text-lg mt-32">
-          Transactions not found. Please check URL.
+          Transactions not found. Please check URL and network type.
         </p>
         <Link
           to="/"
