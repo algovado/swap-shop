@@ -20,3 +20,22 @@ export const INDEXER_URL =
 export const IPFS_ENDPOINT = "https://ipfs.algonode.xyz/ipfs";
 
 export const TX_NOTE = "via Swap Shop";
+
+export const MAX_SWAP_TRANSACTIONS = 16;
+export const SHARE_TRANSACTION_RECEIVER_ADDRESS =
+  "BYKWLR65FS6IBLJO7SKBGBJ4C5T257LBL55OUY6363QBWX24B5QKT6DMEA";
+
+export const TRANSACTION_TYPES = [
+  {
+    label: "Payment",
+    type: "pay",
+  },
+  {
+    label: "Asset Transfer",
+    type: "axfer",
+  },
+  {
+    label: "Opt-In",
+    type: "optin",
+  },
+];

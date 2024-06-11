@@ -32,9 +32,8 @@ const DonationDialog = () => {
     <>
       <Button
         variant="outlined"
-        color="info"
         size="medium"
-        style={{ margin: "0 auto", display: "flex" }}
+        style={{ margin: "0 auto", display: "flex", color: "#00E8EA"}}
         onClick={handleOpen}
       >
         Donate

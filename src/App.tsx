@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.min.css";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import Home from "./routes/Home";
+import CreateSwap from "./routes/CreateSwap";
+import ClaimSwap from "./routes/ClaimSwap";
 
 const darkTheme = createTheme({
   palette: {
@@ -37,6 +39,8 @@ export default function App() {
             <Header />
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/create" element={<CreateSwap />} />
+              <Route path="/claim" element={<ClaimSwap />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </div>

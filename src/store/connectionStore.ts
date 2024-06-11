@@ -6,6 +6,8 @@ interface ConnectionState {
   setAccounts: (accounts: string[]) => void;
   walletAddress: string;
   setWalletAddress: (walletAddress: string) => void;
+  nfdomain: string;
+  setNfdomain: (nfdomain: string) => void;
   networkType: "mainnet" | "testnet";
   setNetworkType: (networkType: "mainnet" | "testnet") => void;
   walletType: "pera" | "defly" | "daffi" | null;
@@ -25,6 +27,8 @@ const useConnectionStore = create<ConnectionState>()(
         set({ networkType });
         window.location.reload();
       },
+      nfdomain: "",
+      setNfdomain: (nfdomain) => set({ nfdomain }),
       walletType: null,
       setWalletType: (walletType) => set({ walletType }),
       disconnect: () =>

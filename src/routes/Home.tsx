@@ -1,24 +1,23 @@
-import useConnectionStore from "../store/connectionStore";
 import DonationDialog from "../components/dialogs/DonationDialog";
+import { Link } from "react-router-dom";
 
 export default function Home() {
-  // ** Store states
-  const connectionState = useConnectionStore((state) => state);
-
-  if (!connectionState.walletAddress) {
-    return (
-      <main className="flex flex-col text-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
-        <h1 className="text-4xl font-semibold text-primary-gray">
-          Welcome to Swap Shop
-        </h1>
-        <DonationDialog />
-      </main>
-    );
-  }
-
   return (
-    <main className="px-4 pb-8 sm:px-6 pt-2">
-      <DonationDialog />
+    <main className="flex flex-col mx-auto justify-between h-[75vh] md:h-[80vh]">
+      <h1 className="text-4xl font-semibold text-primary-gray px-4 text-center py-2">
+        Welcome to Swap Shop
+      </h1>
+      <div className="flex flex-col md:flex-row mx-auto gap-y-4 md:gap-x-4 items-center py-2">
+        <Link
+          to="/create"
+          className="p-2 w-36 text-center bg-primary-blue text-black font-semibold rounded-md hover:bg-secondary-blue transition-all"
+        >
+          Create Swap
+        </Link>
+      </div>
+      <div className="py-2">
+        <DonationDialog />
+      </div>
     </main>
   );
 }

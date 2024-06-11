@@ -1,4 +1,4 @@
-import { Transaction } from "algosdk";
+import { SignedTransaction, Transaction } from "algosdk";
 
 export interface AccountDataType {
   amount: number;
@@ -53,4 +53,37 @@ export interface AssetTransactionsResponse {
 export interface SignTransactionsType {
   txn: Transaction;
   signers: string[];
+}
+
+export interface SwapTransaction {
+  id: number;
+  sender: string | null;
+  receiver: string | null;
+  assetId: number | null;
+  amount: number | null;
+  txType: "pay" | "axfer" | "optin" | "";
+}
+
+export interface ShareTransaction {
+  "confirmed-round": number;
+  "first-valid": number;
+  "last-valid": number;
+  "genesis-id": string;
+  id: string;
+  note: string;
+  "round-time": number;
+  sender: string;
+  "tx-type": string;
+  group?: string
+}
+
+export interface ShareTransactionResponse {
+  "current-round": number;
+  transaction: ShareTransaction;
+}
+
+export interface DecodedTransactionType {
+  tx: Transaction | SignedTransaction;
+  isSigned: boolean;
+  transactionBytes: Uint8Array;
 }

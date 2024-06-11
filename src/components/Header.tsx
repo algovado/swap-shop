@@ -40,14 +40,14 @@ export function Header() {
           <ConnectButton />
         </Toolbar>
       </AppBar>
-      <div className="bg-secondary-green text-black flex py-1 justify-center items-center">
+      <div className="bg-primary-blue text-black flex py-1 justify-center items-center">
         <p className="text-center text-sm">
           Check out our full suite of tools {" "}
           <a
             href="https://labs.thurstober.com"
             target="_blank"
             rel="noreferrer"
-            className="font-semibold hover:text-green-500 transition"
+            className="font-semibold hover:text-gray-700 transition"
           >
             🧪 here!
           </a>

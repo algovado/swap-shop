@@ -32,10 +32,10 @@ export default function NetworkSelect() {
                 backgroundColor: "#fff",
               },
               "& .Mui-checked": {
-                color: "green",
+                color: "blue",
               },
             }}
-            color="success"
+            style={{ color: "#00E8EA" }}
           />
         }
         classes={{ label: "text-white" }}

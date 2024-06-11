@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 
 // ** Utils Imports
 import { AccountDataType } from "../core/types";
-import { getAccountData, shortenAddress } from "../core/utils";
+import { getAccountData, getNfdDomain, shortenAddress } from "../core/utils";
 import NetworkSelect from "./selects/NetworkSelect";
 
 // ** Wallet Imports
@@ -53,6 +53,10 @@ export default function ConnectButton() {
       connection.setAccounts(accounts);
       connection.setWalletAddress(accounts[0]);
       connection.setWalletType("pera");
+      const nfdomain = await getNfdDomain(accounts[0]);
+      if (nfdomain) {
+        connection.setNfdomain(nfdomain);
+      }
       toast.success("Connected!");
     } catch (err) {
       toast.error("Failed to connect!");
@@ -67,6 +71,10 @@ export default function ConnectButton() {
       connection.setAccounts(accounts);
       connection.setWalletAddress(accounts[0]);
       connection.setWalletType("defly");
+      const nfdomain = await getNfdDomain(accounts[0]);
+      if (nfdomain) {
+        connection.setNfdomain(nfdomain);
+      }
       toast.success("Connected!");
     } catch (err) {
       toast.error("Failed to connect!");
@@ -81,6 +89,10 @@ export default function ConnectButton() {
       connection.setAccounts(accounts);
       connection.setWalletAddress(accounts[0]);
       connection.setWalletType("daffi");
+      const nfdomain = await getNfdDomain(accounts[0]);
+      if (nfdomain) {
+        connection.setNfdomain(nfdomain);
+      }
       toast.success("Connected!");
     } catch (err) {
       toast.error("Failed to connect!");
@@ -145,9 +157,9 @@ export default function ConnectButton() {
           aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
           color="success"
-          className="hover:bg-primary-green hover:text-white transition"
+          className="hover:bg-primary-blue hover:text-white transition"
         >
-          <span className="font-sans">Connect</span>
+          <span className="font-sans text-primary-blue">Connect</span>
         </Button>
       ) : (
         <Tooltip title="Account" placement="bottom-start">
@@ -243,8 +255,16 @@ export default function ConnectButton() {
               >
                 <Select
                   value={connection.walletAddress}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     connection.setWalletAddress(e.target.value as string);
+                    const nfdomain = await getNfdDomain(
+                      e.target.value as string
+                    );
+                    if (nfdomain !== e.target.value) {
+                      connection.setNfdomain(nfdomain);
+                    } else {
+                      connection.setNfdomain("");
+                    }
                     setSwitchAccount(!switchAccount);
                   }}
                   inputProps={{ "aria-label": "Without label" }}
@@ -273,6 +293,14 @@ export default function ConnectButton() {
               onClick={handleClose}
             >
               <div className="flex flex-col justify-start">
+                {connection.nfdomain &&
+                  connection.nfdomain !== connection.walletAddress && (
+                    <span className="text-sm font-medium">
+                      <div className="flex flex-row items-center">
+                        {connection.nfdomain}
+                      </div>
+                    </span>
+                  )}
                 <span className="text-sm font-medium">
                   <div className="flex flex-row items-center">
                     Balance: {((accountData?.amount || 0) / 10 ** 6).toFixed(2)}
