@@ -20,6 +20,7 @@ export type SwapTransactionComponentProps = {
     value: string | number
   ) => void;
   enteredWallets: string[] | null;
+  enteredAssetIds: number[] | null;
   isClaim: boolean;
 };
 
@@ -30,6 +31,7 @@ export default function SwapTransactionComponent({
   updateSwapTransaction,
   enteredWallets,
   isClaim,
+  enteredAssetIds,
 }: SwapTransactionComponentProps) {
   const connection = useConnectionStore((state) => state);
 
@@ -94,7 +96,7 @@ export default function SwapTransactionComponent({
           renderInput={(params) => (
             <TextField
               {...params}
-              placeholder="Sender"
+              placeholder="Address or NFD"
               onChange={(e) =>
                 updateSwapTransaction(transaction.id, "sender", e.target.value)
               }
@@ -114,7 +116,7 @@ export default function SwapTransactionComponent({
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder="Receiver"
+                placeholder="Address or NFD"
                 onChange={(e) =>
                   updateSwapTransaction(
                     transaction.id,
@@ -130,19 +132,29 @@ export default function SwapTransactionComponent({
             disabled={isClaim}
           />
         )}
-        <TextField
+        <Autocomplete
+          freeSolo
           id={`assetId-${transaction.id}`}
-          type="number"
-          disabled={transaction.txType === "pay" || isClaim}
-          placeholder={transaction.txType === "pay" ? "ALGO" : "Asset Id"}
+          options={enteredAssetIds || []}
           value={transaction.assetId === 1 ? "" : transaction.assetId || ""}
-          onChange={(e) =>
-            updateSwapTransaction(
-              transaction.id,
-              "assetId",
-              Number(e.target.value)
-            )
-          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder={transaction.txType === "pay" ? "ALGO" : "Asset Id"}
+              type="number"
+              onChange={(e) =>
+                updateSwapTransaction(
+                  transaction.id,
+                  "assetId",
+                  Number(e.target.value)
+                )
+              }
+            />
+          )}
+          onInputChange={(e, value) => {
+            updateSwapTransaction(transaction.id, "assetId", Number(value));
+          }}
+          disabled={transaction.txType === "pay" || isClaim}
         />
         {transaction.txType !== "optin" && (
           <TextField

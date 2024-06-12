@@ -60,7 +60,7 @@ export default function ClaimSwap() {
         }
         transactions.push(transactionData);
       }
-      const swapTransactions = getSwapTransactionsFromNotes(
+      const swapTransactions = await getSwapTransactionsFromNotes(
         transactions.map((tx) => tx.transaction)
       );
       setShareTransactions(swapTransactions);
@@ -109,7 +109,7 @@ export default function ClaimSwap() {
       setStep(COMPLETED_STEP);
     } catch (error) {
       const parsedError = parseClientError(error as AlgoClientError);
-      toast.error(parsedError.message);
+      toast.error("Transaction failed. Plese check the error.");
       setSendError(parsedError.message);
       setStep(SIGNED_TRANSACTIONS_STEP);
     }
@@ -168,6 +168,7 @@ export default function ClaimSwap() {
             key={transaction.swapTransaction.id}
             transaction={transaction.swapTransaction}
             enteredWallets={[]}
+            enteredAssetIds={[]}
             removeSwapTransaction={() => {}}
             updateSwapTransaction={() => {}}
             isClaim={true}
@@ -230,10 +231,10 @@ export default function ClaimSwap() {
           <div className="text-red-400 text-center text-base border-2 border-red-400 w-1/2 mx-auto p-4 rounded-md">
             <span className="text-primary-gray">SWAP FAILED</span>
             <br />
-            {sendError}
+            <p className="mx-auto ax-w-64 text-center">{sendError}</p>
             <br />
             <span className="text-primary-gray">
-              Please check the error and try again.
+              Please check the error and try again if you fixed the issue.
             </span>
           </div>
         )}

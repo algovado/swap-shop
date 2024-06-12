@@ -196,6 +196,16 @@ export default function CreateSwap() {
                   .concat([connectionState.walletAddress])
               )
             )}
+            enteredAssetIds={Array.from(
+              new Set(
+                swapTransactions
+                  .filter(
+                    (t) =>
+                      t.assetId !== null && t.assetId !== 0 && t.assetId.toString() !== ""
+                  )
+                  .map((t) => t.assetId as number)
+              )
+            )}
             isClaim={false}
           />
         ))}

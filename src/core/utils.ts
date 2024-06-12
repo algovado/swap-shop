@@ -293,6 +293,7 @@ export async function createSignedSwapTransactions(
           const assetData = await getAssetData(swapTx.assetId);
           assetDecimals[swapTx.assetId] = assetData.params.decimals;
         } catch (error) {
+          console.log(error);
           throw new Error(`Invalid Asset Id for transaction ${i + 1}`);
         }
       }
@@ -521,7 +522,7 @@ function deconcatenateTransactions(uint8array: Uint8Array): Uint8Array[] {
   return transactions;
 }
 
-export function getSwapTransactionsFromNotes(
+export async function getSwapTransactionsFromNotes(
   shareTransactions: ShareTransaction[]
 ) {
   const notes = shareTransactions.map((st) => st.note);
@@ -541,60 +542,59 @@ export function getSwapTransactionsFromNotes(
     transactionBytes: Uint8Array;
   }[];
 
-  decodedTransactions.forEach((dt, index) => {
+  for (let index = 0; index < decodedTransactions.length; index++) {
+    const dt = decodedTransactions[index];
     const txn = dt.isSigned ? (dt.tx as SignTransactionsType).txn : dt.tx;
     const { from, to, amount, assetIndex, type } = txn as Transaction;
-    switch (type) {
-      case "pay":
+    if (type === "pay") {
+      swapTransactions.push({
+        swapTransaction: {
+          id: index,
+          sender: encodeAddress(from.publicKey),
+          receiver: encodeAddress(to.publicKey),
+          assetId: 1,
+          amount: microalgosToAlgos(amount as number),
+          txType: "pay",
+        },
+        isSigned: dt.isSigned,
+        transactionBytes: dt.transactionBytes,
+      });
+    } else if (type === "axfer") {
+      if (
+        encodeAddress(from.publicKey) === encodeAddress(to.publicKey) &&
+        amount === undefined
+      ) {
         swapTransactions.push({
           swapTransaction: {
             id: index,
             sender: encodeAddress(from.publicKey),
             receiver: encodeAddress(to.publicKey),
-            assetId: 1,
-            amount: microalgosToAlgos(amount as number),
-            txType: "pay",
+            assetId: assetIndex,
+            amount: 0,
+            txType: "optin",
           },
           isSigned: dt.isSigned,
           transactionBytes: dt.transactionBytes,
         });
-        break;
-      case "axfer":
-        if (
-          encodeAddress(from.publicKey) === encodeAddress(to.publicKey) &&
-          amount === undefined
-        ) {
-          swapTransactions.push({
-            swapTransaction: {
-              id: index,
-              sender: encodeAddress(from.publicKey),
-              receiver: encodeAddress(to.publicKey),
-              assetId: assetIndex,
-              amount: 0,
-              txType: "optin",
-            },
-            isSigned: dt.isSigned,
-            transactionBytes: dt.transactionBytes,
-          });
-        } else {
-          swapTransactions.push({
-            swapTransaction: {
-              id: index,
-              sender: encodeAddress(from.publicKey),
-              receiver: encodeAddress(to.publicKey),
-              assetId: assetIndex,
-              amount: amount as number,
-              txType: "axfer",
-            },
-            isSigned: dt.isSigned,
-            transactionBytes: dt.transactionBytes,
-          });
-        }
-        break;
-      default:
-        break;
+      } else {
+        const assetData = await getAssetData(assetIndex);
+        const assetDecimals = assetData.params.decimals;
+        swapTransactions.push({
+          swapTransaction: {
+            id: index,
+            sender: encodeAddress(from.publicKey),
+            receiver: encodeAddress(to.publicKey),
+            assetId: assetIndex,
+            amount: (amount as number) / Math.pow(10, assetDecimals),
+            txType: "axfer",
+          },
+          isSigned: dt.isSigned,
+          transactionBytes: dt.transactionBytes,
+        });
+      }
     }
-  });
+  }
+
   return swapTransactions;
 }
 
