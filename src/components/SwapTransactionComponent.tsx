@@ -96,7 +96,7 @@ export default function SwapTransactionComponent({
           renderInput={(params) => (
             <TextField
               {...params}
-              placeholder="Address or NFD"
+              placeholder="Sender Address or NFD"
               onChange={(e) =>
                 updateSwapTransaction(transaction.id, "sender", e.target.value)
               }
@@ -116,7 +116,7 @@ export default function SwapTransactionComponent({
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder="Address or NFD"
+                placeholder="Receiver Address or NFD"
                 onChange={(e) =>
                   updateSwapTransaction(
                     transaction.id,

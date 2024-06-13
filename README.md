@@ -118,7 +118,7 @@ if (txIds.length > 1) {
 
 ## Deployment
 
-Changes that are merged to `main` will be deployed automatically to [Swap Shop](https://shop.thurstober.com/).
+Changes that are merged to `main` will be deployed automatically to [Swap Shop](https://swapshop.thurstober.com/).
 
 ## Contributing
 
