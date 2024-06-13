@@ -1,7 +1,7 @@
 # Swap Shop
 
 The ability to claim a designed NFT, the ability to automatically claim a giveaway win, the ability to buy tokens, and the ability to create a swap shop.
-To increase the functionality, also be making a Discord bot as an [example](example-codes-for-using-your-botsprojects)
+To increase the functionality, also be making a Discord bot as an [example](https://github.com/algovado/swap-shop?tab=readme-ov-file#example-codes-for-using-your-botsprojects)
 We hope that this will make it easier to adopt this free to use software. In addition, those who do not know how to code will be able to manually set up a swap themselves through a no-code interface.
 
 This project funded by Algorand Foundation's [xGov](https://xgov.algorand.foundation) program.
