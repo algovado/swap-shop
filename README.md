@@ -49,14 +49,14 @@ const ASSET_AMOUNT = 1; // Asset amount
 // CREATE A SWAP PART
 const params = await algodClient.getTransactionParams().do();
 
-const transaction = makePaymentTxnWithSuggestedParamsFromObject({
+const algoTxn = makePaymentTxnWithSuggestedParamsFromObject({
   from: SENDER,
   to: RECEIVER,
   amount: algosToMicroalgos(ALGO_AMOUNT),
   suggestedParams: params,
 });
 
-const transaction_2 = makeAssetTransferTxnWithSuggestedParamsFromObject({
+const assetTxn = makeAssetTransferTxnWithSuggestedParamsFromObject({
   from: RECEIVER,
   to: SENDER,
   amount: ASSET_AMOUNT,
@@ -64,18 +64,21 @@ const transaction_2 = makeAssetTransferTxnWithSuggestedParamsFromObject({
   suggestedParams: params,
 });
 
-const groupId = computeGroupID([transaction, transaction_2]);
-transaction.group = groupId;
-transaction_2.group = groupId;
+const swapTxns = [algoTxn, assetTxn]
 
-const signedTxns = transaction.signTxn(SENDER_SK);
-const mergedTxns = mergeSignedAndUnsignedTransactions(signedTxns, [
-  transaction,
-  transaction_2,
-]);
+const groupId = computeGroupID(swapTxns);
+swapTxns.forEach((txn) => {
+  txn.group = groupId;
+});
+
+const signedTxns = await signTransactions(swapTxns);
+const mergedTxns = mergeSignedAndUnsignedTransactions(
+  signedTxns,
+  swapTxns
+);
 
 // CREATE A TX (OR GROUP) FOR SHARE URL
-var transactionNote = concatenateTransactions(signedTxns);
+var transactionNote = concatenateTransactions(mergedTxns);
 const notes = [];
 let note = new Uint8Array();
 for (let i = 0; i < transactionNote.length; i++) {
@@ -89,6 +92,8 @@ if (note.length > 0) {
   notes.push(note);
 }
 
+const shareTxns = [];
+
 for (let i = 0; i < notes.length; i++) {
   const transaction = makePaymentTxnWithSuggestedParamsFromObject({
     from: sender,
@@ -97,23 +102,24 @@ for (let i = 0; i < notes.length; i++) {
     suggestedParams: params,
     note: notes[i],
   });
-  transactions.push(transaction);
+  shareTxns.push(transaction);
 }
-var groupId = computeGroupID(transactions);
-var txIds = [] as string[];
-transactions.forEach((txn) => {
+var groupId = computeGroupID(shareTxns);
+var shareTxnIds = [] as string[];
+shareTxns.forEach((txn) => {
   txn.group = groupId;
-  txIds.push(txn.txID());
+  shareTxnIds.push(txn.txID());
 });
 const signedShareTxns = await signTransactions(transactions);
-
+await sendSignedTransaction(signedShareTxns);
 // SHARE THIS URL WITH OTHER PARTY
 const SHARE_URL = "https://swapshop.thurstober.com/claim?tx=signedShareTxns[0]"
-if (txIds.length > 1) {
-  for (let i = 1; i < txIds.length; i++) {
-    SHARE_URL += "&tx=" + txIds[i];
+if (shareTxnIds.length > 1) {
+  for (let i = 1; i < shareTxnIds.length; i++) {
+    SHARE_URL += "&tx=" + shareTxnIds[i];
   }
 }
+console.log(SHARE_URL)
 ```
 
 ## Deployment
