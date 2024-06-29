@@ -104,10 +104,10 @@ for (let i = 0; i < notes.length; i++) {
   });
   shareTxns.push(transaction);
 }
-var groupId = computeGroupID(shareTxns);
+var shareGroupId = computeGroupID(shareTxns);
 var shareTxnIds = [] as string[];
 shareTxns.forEach((txn) => {
-  txn.group = groupId;
+  txn.group = shareGroupId;
   shareTxnIds.push(txn.txID());
 });
 const signedShareTxns = await signTransactions(transactions);
