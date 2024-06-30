@@ -134,6 +134,21 @@ def generate_swap_shop_note(txns: List[transaction.Transaction]):
     # Join all the info together into expected byte array shoved in the note(s)
     return bytearray(metadata + b"".join(encoded_txns))
 
+# Create Transactions and create the group.
+groupped_txns = to_be_signed_txns + unsigned_txns
+group_id = transaction.calculate_group_id(groupped_txns)
+
+for txn in unsigned_txns:
+    txn.group = group_id
+
+# Sign our side of txns
+signed_txns: List[transaction.Transaction] = []
+for txn in to_be_signed_txns:
+    txn.group = group_id
+    signed_txns.append(txn.sign(secret_key))
+
+group_txns = signed_txns + swapper_2_txns
+
 # Encode Group Txn
 swap_shop_note = generate_swap_shop_note([txn for txn in group_txns])  
 
