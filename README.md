@@ -121,6 +121,7 @@ if (shareTxnIds.length > 1) {
 }
 console.log(SHARE_URL)
 ```
+### Python
 ```py
 # Util Function
 def generate_swap_shop_note(txns: List[transaction.Transaction]):
