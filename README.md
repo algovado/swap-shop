@@ -113,10 +113,10 @@ shareTxns.forEach((txn) => {
 const signedShareTxns = await signTransactions(transactions);
 await sendSignedTransaction(signedShareTxns);
 // SHARE THIS URL WITH OTHER PARTY
-const SHARE_URL = "https://swapshop.thurstober.com/claim?tx=signedShareTxns[0]"
+var SHARE_URL = "https://swapshop.thurstober.com/claim?txid=signedShareTxns[0]"
 if (shareTxnIds.length > 1) {
   for (let i = 1; i < shareTxnIds.length; i++) {
-    SHARE_URL += "&tx=" + shareTxnIds[i];
+    SHARE_URL += "&txid=" + shareTxnIds[i];
   }
 }
 console.log(SHARE_URL)
