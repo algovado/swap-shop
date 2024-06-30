@@ -154,7 +154,7 @@ swap_shop_note = generate_swap_shop_note([txn for txn in group_txns])
 
 # Chunkify encoded txns into 1000 char bites for note fields
 chunk_size = 1000
-chunks = [swap_shop_mega_note[i:i+chunk_size] for i in range(0, len(swap_shop_mega_note), chunk_size)]
+chunks = [swap_shop_note[i:i+chunk_size] for i in range(0, len(swap_shop_mega_note), chunk_size)]
 
 # Create wrapper txns which will contain the encoded chunks
 wrapper_txns: List[transaction.Transaction] = []
