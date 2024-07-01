@@ -121,7 +121,68 @@ if (shareTxnIds.length > 1) {
 }
 console.log(SHARE_URL)
 ```
+### Python
+```py
+# Util Function
+def generate_swap_shop_note(txns: List[transaction.Transaction]):
+    # Convert Transaction Objects into byte array representations
+    encoded_txns = [msgpack.packb(txn.dictify()) for txn in txns]
+    # Build List of lengths for each transaction that will end up in the note(s) field
+    lengths = [len(txn) for txn in encoded_txns]
+    # Build the header/prefix with info needed to build Transactions on the otherside
+    metadata = f"{len(encoded_txns)}:{':'.join(map(str, lengths))}$".encode("utf-8") 
+    # Join all the info together into expected byte array shoved in the note(s)
+    return bytearray(metadata + b"".join(encoded_txns))
 
+# Create Transactions and create the group.
+groupped_txns = to_be_signed_txns + unsigned_txns
+group_id = transaction.calculate_group_id(groupped_txns)
+
+for txn in unsigned_txns:
+    txn.group = group_id
+
+# Sign our side of txns
+signed_txns: List[transaction.Transaction] = []
+for txn in to_be_signed_txns:
+    txn.group = group_id
+    signed_txns.append(txn.sign(secret_key))
+
+group_txns = signed_txns + swapper_2_txns
+
+# Encode Group Txn
+swap_shop_note = generate_swap_shop_note([txn for txn in group_txns])  
+
+# Chunkify encoded txns into 1000 char bites for note fields
+chunk_size = 1000
+chunks = [swap_shop_note[i:i+chunk_size] for i in range(0, len(swap_shop_mega_note), chunk_size)]
+
+# Create wrapper txns which will contain the encoded chunks
+wrapper_txns: List[transaction.Transaction] = []
+for chunk in chunks:
+    txn = transaction.PaymentTxn(
+        sender=WRAPPER_SENDER,
+        sp=params,
+        receiver=WRAPPER_RECEIVER,
+        amt=algos_to_microalgos(WRAPPER_AMOUNT),
+        note=chunk
+    )
+    wrapper_txns.append(txn)
+
+# Create, sign, and submit wrapper txn group
+signed_txns: List[transaction.Transaction] = []
+group_id = transaction.calculate_group_id(wrapper_txns)
+for txn in wrapper_txns:
+    txn.group = group_id
+    signed_txns.append(txn.sign(secret_key))
+
+signed_txns_ids = "".join([f"txid={signed_txns[0].get_txid()}"] + [f"&txid={txn.get_txid()}" for txn in signed_txns[1:]])
+
+txid = client.send_transactions(signed_txns)    
+wait_for_confirmation(client,txid)
+print(txid)
+
+print(f"{SWAP_SHOP_URL}{signed_txns_ids}")
+```
 ## Deployment
 
 Changes that are merged to `main` will be deployed automatically to [Swap Shop](https://swapshop.thurstober.com/).
