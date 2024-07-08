@@ -14,8 +14,10 @@ import {
   decodeSignedTransaction,
   decodeUnsignedTransaction,
   encodeAddress,
+  encodeUnsignedTransaction,
 } from "algosdk";
 import axios from "axios";
+import LuteConnect from "lute-connect";
 import useConnectionStore from "../store/connectionStore";
 import { INDEXER_URL, NODE_URL, TRANSACTION_TYPES } from "./constants";
 import {
@@ -33,6 +35,7 @@ import {
 const peraWallet = new PeraWalletConnect({ shouldShowSignTxnToast: true });
 const deflyWallet = new DeflyWalletConnect({ shouldShowSignTxnToast: true });
 const daffiWallet = new DaffiWalletConnect({ shouldShowSignTxnToast: true });
+const luteWallet = new LuteConnect("Swap Shop");
 const algodClient = new Algodv2("", NODE_URL, "");
 
 export const shortenAddress = (walletAddress: string, count: number = 4) => {
@@ -192,6 +195,16 @@ export async function signTransactions(
       signedTxns = await daffiWallet.signTransaction([
         multipleTxnGroups as SignTransactionsType[],
       ]);
+    } else if (walletType === "lute") {
+      multipleTxnGroups = groups.map((txn) => {
+        return {
+          txn: Buffer.from(encodeUnsignedTransaction(txn)).toString("base64"),
+          signers: [signer],
+        };
+      });
+      signedTxns = (await luteWallet.signTxns(multipleTxnGroups)).filter(
+        (txn) => txn
+      ) as Uint8Array[];
     } else {
       throw new Error("Invalid wallet type!");
     }
@@ -620,4 +633,8 @@ export function decodeTransactionv2(transaction: Uint8Array): Transaction {
   } catch {
     return decodeSignedTransaction(transaction).txn;
   }
+}
+
+export async function getGenesis() {
+  return await algodClient.genesis().do();
 }
