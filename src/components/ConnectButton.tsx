@@ -17,13 +17,19 @@ import { toast } from "react-toastify";
 
 // ** Utils Imports
 import { AccountDataType } from "../core/types";
-import { getAccountData, getNfdDomain, shortenAddress } from "../core/utils";
+import {
+  getAccountData,
+  getGenesis,
+  getNfdDomain,
+  shortenAddress,
+} from "../core/utils";
 import NetworkSelect from "./selects/NetworkSelect";
 
 // ** Wallet Imports
 import { DeflyWalletConnect } from "@blockshake/defly-connect";
 import { DaffiWalletConnect } from "@daffiwallet/connect";
 import { PeraWalletConnect } from "@perawallet/connect";
+import LuteConnect from "lute-connect";
 
 export default function ConnectButton() {
   const connection = useConnectionStore((state) => state);
@@ -35,6 +41,7 @@ export default function ConnectButton() {
   const peraWallet = new PeraWalletConnect();
   const deflyWallet = new DeflyWalletConnect();
   const daffiWallet = new DaffiWalletConnect();
+  const luteWallet = new LuteConnect("Swap Shop");
 
   // handlers
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -93,6 +100,21 @@ export default function ConnectButton() {
       if (nfdomain) {
         connection.setNfdomain(nfdomain);
       }
+      toast.success("Connected!");
+    } catch (err) {
+      toast.error("Failed to connect!");
+    }
+  };
+
+  const connectToLute = async () => {
+    handleClose();
+    try {
+      const genesis = await getGenesis();
+      const genesisID = `${genesis.network}-${genesis.id}`;
+      const accounts = await luteWallet.connect(genesisID);
+      connection.setAccounts(accounts);
+      connection.setWalletAddress(accounts[0]);
+      connection.setWalletType("lute");
       toast.success("Connected!");
     } catch (err) {
       toast.error("Failed to connect!");
@@ -205,8 +227,6 @@ export default function ConnectButton() {
                 backgroundColor: "#131313",
                 color: "white",
                 fontWeight: "bold",
-                borderBottomLeftRadius: "4px",
-                borderBottomRightRadius: "4px",
                 ":hover": { backgroundColor: "#131313", opacity: "0.8" },
               }}
               onClick={connectToDefly}
@@ -218,13 +238,24 @@ export default function ConnectButton() {
                 backgroundColor: "#00BAA4",
                 color: "black",
                 fontWeight: "bold",
-                borderBottomLeftRadius: "4px",
-                borderBottomRightRadius: "4px",
                 ":hover": { backgroundColor: "#00BAA4", opacity: "0.8" },
               }}
               onClick={connectToDaffi}
             >
               Daffi
+            </MenuItem>
+            <MenuItem
+              sx={{
+                backgroundColor: "#AB47BC",
+                color: "black",
+                fontWeight: "bold",
+                borderBottomLeftRadius: "4px",
+                borderBottomRightRadius: "4px",
+                ":hover": { backgroundColor: "#AB47BC", opacity: "0.8" },
+              }}
+              onClick={connectToLute}
+            >
+              Lute
             </MenuItem>
           </MenuList>
         ) : (
