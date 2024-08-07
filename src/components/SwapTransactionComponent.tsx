@@ -162,13 +162,11 @@ export default function SwapTransactionComponent({
             placeholder="Amount"
             type="number"
             value={transaction.amount || ""}
-            onChange={(e) =>
-              updateSwapTransaction(
-                transaction.id,
-                "amount",
-                Number(e.target.value)
-              )
-            }
+            onChange={(e) => {
+              if (Number(e.target.value) >= 0) {
+                updateSwapTransaction(transaction.id, "amount", e.target.value);
+              }
+            }}
             disabled={isClaim}
           />
         )}
